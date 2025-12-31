@@ -84,6 +84,12 @@ export class CustomLambdaDeploymentConfig extends Resource implements ILambdaDep
    */
   public readonly deploymentConfigArn: string;
 
+  public get deploymentConfigRef() {
+    return {
+      deploymentConfigName: this.deploymentConfigName,
+    };
+  }
+
   public constructor(scope: Construct, id: string, props: CustomLambdaDeploymentConfigProps) {
     super(scope, id);
     // Enhanced CDK Analytics Telemetry

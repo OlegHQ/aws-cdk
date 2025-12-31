@@ -83,10 +83,21 @@ export function deploymentConfig(name: string): IBaseDeploymentConfig & IPredefi
   return {
     deploymentConfigName: name,
     deploymentConfigArn: arnForDeploymentConfig(name),
+    deploymentConfigRef: {
+      deploymentConfigName: name,
+    },
     bindEnvironment: (resource) => ({
       deploymentConfigName: name,
       deploymentConfigArn: arnForDeploymentConfig(name, resource),
+      deploymentConfigRef: {
+        deploymentConfigName: name,
+      },
+      node: resource.node,
+      env: resource.env,
     }),
+    // These properties are not used for predefined configs, but required by the interface
+    node: undefined as any,
+    env: undefined as any,
   };
 }
 
