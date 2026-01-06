@@ -112,6 +112,9 @@ export class DeploymentGroupBase extends Resource {
    */
   public readonly deploymentGroupArn!: string;
 
+  /**
+   * A reference to a DeploymentGroup resource.
+   */
   public get deploymentGroupRef(): DeploymentGroupReference {
     return {
       deploymentGroupName: this.deploymentGroupName,
