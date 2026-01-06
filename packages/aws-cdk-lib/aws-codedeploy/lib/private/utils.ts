@@ -1,7 +1,7 @@
 import { Construct } from 'constructs';
 import { IPredefinedDeploymentConfig } from './predefined-deployment-config';
 import * as cloudwatch from '../../../aws-cloudwatch';
-import { Token, Stack, ArnFormat, Arn, Fn, Aws, IResource, ValidationError } from '../../../core';
+import { Token, Stack, ArnFormat, Arn, Fn, Aws, IResource, ValidationError, UnscopedValidationError } from '../../../core';
 import { IBaseDeploymentConfig } from '../base-deployment-config';
 import { CfnDeploymentGroup } from '../codedeploy.generated';
 import { AutoRollbackConfig } from '../rollback-config';
@@ -96,8 +96,12 @@ export function deploymentConfig(name: string): IBaseDeploymentConfig & IPredefi
       env: resource.env,
     }),
     // These properties are not used for predefined configs, but required by the interface
-    node: undefined as any,
-    env: undefined as any,
+    get node(): any {
+      throw new UnscopedValidationError('Cannot get \'node\' attribute from a predefined deployment config');
+    },
+    get env(): any {
+      throw new UnscopedValidationError('Cannot get \'node\' attribute from a predefined deployment config');
+    },
   };
 }
 

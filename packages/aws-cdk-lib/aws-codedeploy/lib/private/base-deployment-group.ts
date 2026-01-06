@@ -5,7 +5,7 @@ import * as iam from '../../../aws-iam';
 import { Resource, ArnFormat, Arn, Aws } from '../../../core';
 import { addConstructMetadata } from '../../../core/lib/metadata-resource';
 import { propertyInjectable } from '../../../core/lib/prop-injectable';
-import { IApplicationRef, IDeploymentConfigRef } from '../../../interfaces/generated/aws-codedeploy-interfaces.generated';
+import { DeploymentGroupReference, IApplicationRef, IDeploymentConfigRef } from '../../../interfaces/generated/aws-codedeploy-interfaces.generated';
 import { IBaseDeploymentConfig } from '../base-deployment-config';
 import { CfnDeploymentGroup } from '../codedeploy.generated';
 
@@ -36,7 +36,7 @@ export class ImportedDeploymentGroupBase extends Resource {
   public readonly deploymentGroupName: string;
   public readonly deploymentGroupArn: string;
 
-  public get deploymentGroupRef() {
+  public get deploymentGroupRef(): DeploymentGroupReference {
     return {
       deploymentGroupName: this.deploymentGroupName,
     };
@@ -112,7 +112,7 @@ export class DeploymentGroupBase extends Resource {
    */
   public readonly deploymentGroupArn!: string;
 
-  public get deploymentGroupRef() {
+  public get deploymentGroupRef(): DeploymentGroupReference {
     return {
       deploymentGroupName: this.deploymentGroupName,
     };

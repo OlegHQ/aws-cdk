@@ -2,7 +2,7 @@ import { Construct } from 'constructs';
 import { ArnFormat, IResource, Resource, Stack, Arn } from '../../../core';
 import { addConstructMetadata } from '../../../core/lib/metadata-resource';
 import { propertyInjectable } from '../../../core/lib/prop-injectable';
-import { IApplicationRef } from '../../../interfaces/generated/aws-codedeploy-interfaces.generated';
+import { ApplicationReference, IApplicationRef } from '../../../interfaces/generated/aws-codedeploy-interfaces.generated';
 import { CfnApplication } from '../codedeploy.generated';
 import { arnForApplication, validateName } from '../private/utils';
 
@@ -61,7 +61,7 @@ export class EcsApplication extends Resource implements IEcsApplication {
     class Import extends Resource implements IEcsApplication {
       public applicationArn = arnForApplication(Stack.of(scope), ecsApplicationName);
       public applicationName = ecsApplicationName;
-      public get applicationRef() {
+      public get applicationRef(): ApplicationReference {
         return {
           applicationName: this.applicationName,
         };
@@ -83,7 +83,7 @@ export class EcsApplication extends Resource implements IEcsApplication {
     return new class extends Resource implements IEcsApplication {
       public applicationArn = ecsApplicationArn;
       public applicationName = Arn.split(ecsApplicationArn, ArnFormat.COLON_RESOURCE_NAME).resourceName ?? '<invalid arn>';
-      public get applicationRef() {
+      public get applicationRef(): ApplicationReference {
         return {
           applicationName: this.applicationName,
         };
@@ -94,7 +94,7 @@ export class EcsApplication extends Resource implements IEcsApplication {
   public readonly applicationArn: string;
   public readonly applicationName: string;
 
-  public get applicationRef() {
+  public get applicationRef(): ApplicationReference {
     return {
       applicationName: this.applicationName,
     };

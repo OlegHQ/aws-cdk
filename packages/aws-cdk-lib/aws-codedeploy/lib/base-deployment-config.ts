@@ -4,7 +4,7 @@ import { MinimumHealthyHosts, MinimumHealthyHostsPerZone } from './host-health-c
 import { arnForDeploymentConfig, validateName } from './private/utils';
 import { TrafficRouting } from './traffic-routing-config';
 import { ArnFormat, Duration, Resource, Stack, ValidationError } from '../../core';
-import { IDeploymentConfigRef } from '../../interfaces/generated/aws-codedeploy-interfaces.generated';
+import { DeploymentConfigReference, IDeploymentConfigRef } from '../../interfaces/generated/aws-codedeploy-interfaces.generated';
 
 /**
  * The base class for ServerDeploymentConfig, EcsDeploymentConfig,
@@ -155,7 +155,7 @@ export abstract class BaseDeploymentConfig extends Resource implements IBaseDepl
     class Import extends Resource implements IBaseDeploymentConfig {
       public readonly deploymentConfigName = deploymentConfigName;
       public readonly deploymentConfigArn = arn;
-      public get deploymentConfigRef() {
+      public get deploymentConfigRef(): DeploymentConfigReference {
         return {
           deploymentConfigName: this.deploymentConfigName,
         };
@@ -177,7 +177,7 @@ export abstract class BaseDeploymentConfig extends Resource implements IBaseDepl
    */
   public readonly deploymentConfigArn: string;
 
-  public get deploymentConfigRef() {
+  public get deploymentConfigRef(): DeploymentConfigReference {
     return {
       deploymentConfigName: this.deploymentConfigName,
     };
