@@ -853,15 +853,15 @@ declare const cluster: eks.Cluster;
 cdk.RemovalPolicies.of(cluster.openIdConnectProvider).apply(cdk.RemovalPolicy.RETAIN);
 ```
 
-1. Run `cdk diff` to verify the changes are expected then `cdk deploy`.
+2. Run `cdk diff` to verify the changes are expected then `cdk deploy`.
 
-2. Add the following to the `context` field of your `cdk.json` to enable the feature flag that creates the native oidc provider.
+3. Add the following to the `context` field of your `cdk.json` to enable the feature flag that creates the native oidc provider.
 
 ```json
 		"@aws-cdk/aws-eks:useNativeOidcProvider": true,
 ```
 
-1. Run `cdk diff` and ensure the changes are expected. Example of an expected diff:
+4. Run `cdk diff` and ensure the changes are expected. Example of an expected diff:
 
 ```bash
 Resources
