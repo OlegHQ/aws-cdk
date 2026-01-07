@@ -1494,7 +1494,7 @@ Resources
 
 4. Run `cdk import --force` and provide the ARN of the existing OpenIdConnectProvider when prompted. You will get a warning about pending changes to existing resources that is expected.
 
-5. Run `cdk deploy` to apply any pending changes. This apply the destroy/orphan changes in the above example.
+5. Run `cdk deploy` to apply any pending changes. This will apply the destroy/orphan changes in the above example.
 
 
 If you are creating the OpenIdConnectProvider manually via `new eks.OpenIdConnectProvider`, follow these steps:
