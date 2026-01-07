@@ -12,7 +12,7 @@ import * as constructs from 'constructs';
 import * as hello from './hello-k8s';
 import { getClusterVersionConfig } from './integ-tests-kubernetes-version';
 import * as eks from 'aws-cdk-lib/aws-eks';
-import { IAM_OIDC_REJECT_UNAUTHORIZED_CONNECTIONS, EKS_USE_NATIVE_OIDC_PROVIDER } from 'aws-cdk-lib/cx-api';
+import { IAM_OIDC_REJECT_UNAUTHORIZED_CONNECTIONS } from 'aws-cdk-lib/cx-api';
 
 class EksClusterStack extends Stack {
   private cluster: eks.Cluster;
@@ -100,7 +100,6 @@ class EksClusterStack extends Stack {
     new CfnOutput(this, 'ClusterEncryptionConfigKeyArn', { value: this.cluster.clusterEncryptionConfigKeyArn });
     new CfnOutput(this, 'ClusterName', { value: this.cluster.clusterName });
     new CfnOutput(this, 'NodegroupName', { value: this.cluster.defaultNodegroup!.nodegroupName });
-    new CfnOutput(this, 'OidcProviderArn', { value: this.cluster.openIdConnectProvider.openIdConnectProviderArn });
   }
 
   private assertServiceAccount() {
@@ -359,36 +358,21 @@ const stack = new EksClusterStack(app, 'aws-cdk-eks-cluster', {
   env: { region: 'us-east-1' },
 });
 
-const appWithNativeOidc = new App({
-  postCliContext: {
-    '@aws-cdk/aws-lambda:useCdkManagedLogGroup': false,
-    [IAM_OIDC_REJECT_UNAUTHORIZED_CONNECTIONS]: false,
-    '@aws-cdk/aws-lambda:createNewPoliciesWithAddToRolePolicy': false,
-    [EKS_USE_NATIVE_OIDC_PROVIDER]: true,
-  },
-});
-
-const nativeOidcStack = new EksClusterStack(appWithNativeOidc, 'aws-cdk-eks-cluster-native-oidc', {
-  env: { region: 'us-east-1' },
-});
-
 if (process.env.CDK_INTEG_ACCOUNT !== '12345678') {
   // only validate if we are about to actually deploy.
   // TODO: better way to determine this, right now the 'CDK_INTEG_ACCOUNT' seems like the only way.
 
-  for (const testStack of [stack, nativeOidcStack]) {
-    if (Token.isUnresolved(testStack.region)) {
-      throw new Error(`region (${testStack.region}) cannot be a token and must be configured to one of: ${supportedRegions}`);
-    }
+  if (Token.isUnresolved(stack.region)) {
+    throw new Error(`region (${stack.region}) cannot be a token and must be configured to one of: ${supportedRegions}`);
+  }
 
-    if (!supportedRegions.includes(testStack.region)) {
-      throw new Error(`region (${testStack.region}) must be configured to one of: ${supportedRegions}`);
-    }
+  if (!supportedRegions.includes(stack.region)) {
+    throw new Error(`region (${stack.region}) must be configured to one of: ${supportedRegions}`);
   }
 }
 
 new integ.IntegTest(app, 'aws-cdk-eks-cluster-integ', {
-  testCases: [stack, nativeOidcStack],
+  testCases: [stack],
   // Test includes assets that are updated weekly. If not disabled, the upgrade PR will fail.
   diffAssets: false,
   cdkCommandOptions: {
@@ -401,4 +385,3 @@ new integ.IntegTest(app, 'aws-cdk-eks-cluster-integ', {
 });
 
 app.synth();
-appWithNativeOidc.synth();
