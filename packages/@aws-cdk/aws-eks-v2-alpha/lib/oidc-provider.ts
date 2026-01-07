@@ -48,12 +48,7 @@ export interface OpenIdConnectProviderNativeProps extends OpenIdConnectProviderP
  * @see https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles_providers_oidc.html
  *
  * @resource AWS::CloudFormation::CustomResource
- * @deprecated Use `OpenIdConnectProviderNative` instead. To migrate existing resources:
- * 1. Set the removalPolicy of the existing `OpenIdConnectProvider` to `RemovalPolicy.RETAIN`.
- * 2. Deploy with the retain policy to avoid deletion of the underlying resource.
- * 3. Replace `OpenIdConnectProvider` with `OpenIdConnectProviderNative` in your code
- * 4. Run `cdk import` to import the existing OIDC provider resource by providing the existing ARN.
- * See https://docs.aws.amazon.com/cdk/v2/guide/ref-cli-cmd-import.html
+ * @deprecated Use `OpenIdConnectProviderNative` instead.
  */
 @propertyInjectable
 export class OpenIdConnectProvider extends iam.OpenIdConnectProvider {
