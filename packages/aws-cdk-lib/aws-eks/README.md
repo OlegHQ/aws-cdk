@@ -1435,11 +1435,11 @@ To do so, pass the `openIdConnectProvider` property when you import the cluster 
 
 ```ts
 // you can import an existing provider
-const provider = eks.OpenIdConnectProvider.fromOpenIdConnectProviderArn(this, 'Provider', 'arn:aws:iam::123456:oidc-provider/oidc.eks.eu-west-1.amazonaws.com/id/AB123456ABC');
+const provider = eks.OpenIdConnectProviderNative.fromOidcProviderArn(this, 'Provider', 'arn:aws:iam::123456:oidc-provider/oidc.eks.eu-west-1.amazonaws.com/id/AB123456ABC');
 
 // or create a new one using an existing issuer url
 declare const issuerUrl: string;
-const provider2 = new eks.OpenIdConnectProvider(this, 'Provider', {
+const provider2 = new eks.OpenIdConnectProviderNative(this, 'Provider', {
   url: issuerUrl,
 });
 

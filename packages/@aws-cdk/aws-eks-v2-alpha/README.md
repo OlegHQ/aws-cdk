@@ -755,6 +755,91 @@ By default, the cluster creator role will be granted the cluster admin permissio
 
 > **Note** - Switching `bootstrapClusterCreatorAdminPermissions` on an existing cluster would cause cluster replacement and should be avoided in production.
 
+
+### Service Accounts
+
+With services account you can provide Kubernetes Pods access to AWS resources.
+
+```ts
+declare const cluster: eks.Cluster;
+// add service account
+const serviceAccount = cluster.addServiceAccount('MyServiceAccount');
+
+const bucket = new s3.Bucket(this, 'Bucket');
+bucket.grantReadWrite(serviceAccount);
+
+const mypod = cluster.addManifest('mypod', {
+  apiVersion: 'v1',
+  kind: 'Pod',
+  metadata: { name: 'mypod' },
+  spec: {
+    serviceAccountName: serviceAccount.serviceAccountName,
+    containers: [
+      {
+        name: 'hello',
+        image: 'paulbouwer/hello-kubernetes:1.5',
+        ports: [ { containerPort: 8080 } ],
+      },
+    ],
+  },
+});
+
+// create the resource after the service account.
+mypod.node.addDependency(serviceAccount);
+
+// print the IAM role arn for this service account
+new CfnOutput(this, 'ServiceAccountIamRole', { value: serviceAccount.role.roleArn });
+```
+
+Note that using `serviceAccount.serviceAccountName` above **does not** translate into a resource dependency.
+This is why an explicit dependency is needed. See <https://github.com/aws/aws-cdk/issues/9910> for more details.
+
+It is possible to pass annotations and labels to the service account.
+
+```ts
+declare const cluster: eks.Cluster;
+// add service account with annotations and labels
+const serviceAccount = cluster.addServiceAccount('MyServiceAccount', {
+  annotations: {
+    'eks.amazonaws.com/sts-regional-endpoints': 'false',
+  },
+  labels: {
+    'some-label': 'with-some-value',
+  },
+});
+```
+
+You can also add service accounts to existing clusters.
+To do so, pass the `openIdConnectProvider` property when you import the cluster into the application.
+
+```ts
+// you can import an existing provider
+const provider = eks.OpenIdConnectProviderNative.fromOidcProviderArn(this, 'Provider', 'arn:aws:iam::123456:oidc-provider/oidc.eks.eu-west-1.amazonaws.com/id/AB123456ABC');
+
+// or create a new one using an existing issuer url
+declare const issuerUrl: string;
+const provider2 = new eks.OpenIdConnectProviderNative(this, 'Provider', {
+  url: issuerUrl,
+});
+
+import { KubectlV34Layer } from '@aws-cdk/lambda-layer-kubectl-v34';
+
+const cluster = new eks.Cluster(this, 'hello-eks', {
+  version: eks.KubernetesVersion.V1_34,
+  openIdConnectProvider: provider,
+  kubectlProviderOptions: {
+    kubectlLayer: new KubectlV34Layer(this, 'kubectl'),
+  }
+});
+
+const serviceAccount = cluster.addServiceAccount('MyServiceAccount');
+
+const bucket = new s3.Bucket(this, 'Bucket');
+bucket.grantReadWrite(serviceAccount);
+```
+
+Note that adding service accounts requires running `kubectl` commands against the cluster which requires you to provide `kubectlProviderOptions` in the cluster props to create the `kubectl` provider. See [Kubectl Support](https://docs.aws.amazon.com/cdk/api/v2/docs/aws-eks-v2-alpha-readme.html#kubectl-support)
+
 ### Cluster Security Group
 
 When you create an Amazon EKS cluster, a [cluster security group](https://docs.aws.amazon.com/eks/latest/userguide/sec-group-reqs.html)
