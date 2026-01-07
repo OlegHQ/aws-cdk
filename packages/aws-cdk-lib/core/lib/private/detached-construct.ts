@@ -1,5 +1,5 @@
 import { Construct, IConstruct } from 'constructs';
-import type { ResourceEnvironment } from '../environment';
+import type { IEnvironmentAware, ResourceEnvironment } from '../environment';
 import { UnscopedValidationError } from '../errors';
 
 const CONSTRUCT_SYM = Symbol.for('constructs.Construct');
@@ -42,5 +42,28 @@ export abstract class DetachedConstruct extends Construct implements IConstruct 
 
   public get env(): ResourceEnvironment {
     throw new UnscopedValidationError(this.errorMessage);
+  }
+}
+
+/**
+ * A resource construct that is not attached to the construct tree.
+ *
+ * This server as a base class for objects that need to implement
+ * `IConstruct`/`IEnvironmentAware` but can't because they have no way of
+ * finding the construct tree at the moment they are instantiated.
+ *
+ * All default accessors that have to do with the construct and construct
+ * environments will an error.
+ *
+ * The usability of these constructs is limited, and so the use of this base
+ * class should only be used as a last resort.
+ */
+export abstract class DetachedResource extends DetachedConstruct implements IEnvironmentAware {
+  constructor(private readonly source: string) {
+    super(`Objects returned by ${source} cannot be used in this API: they are not real constructs and do not have a construct tree 'node'`);
+  }
+
+  public get env(): ResourceEnvironment {
+    throw new UnscopedValidationError(`Objects returned by ${this.source} cannot be used in this API: they are not real constructs and do not have an 'env'`);
   }
 }

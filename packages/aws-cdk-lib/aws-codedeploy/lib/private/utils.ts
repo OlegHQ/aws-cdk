@@ -1,10 +1,11 @@
 import { Construct } from 'constructs';
 import { IPredefinedDeploymentConfig } from './predefined-deployment-config';
-import { Token, Stack, ArnFormat, Arn, Fn, Aws, IResource, ValidationError, UnscopedValidationError } from '../../../core';
+import { Token, Stack, ArnFormat, Arn, Fn, Aws, IResource, ValidationError } from '../../../core';
 import { IAlarmRef } from '../../../interfaces/generated/aws-cloudwatch-interfaces.generated';
 import { IBaseDeploymentConfig } from '../base-deployment-config';
 import { CfnDeploymentGroup } from '../codedeploy.generated';
 import { AutoRollbackConfig } from '../rollback-config';
+import { DetachedResource } from '../../../core/lib/private/detached-construct';
 
 export function arnForApplication(stack: Stack, applicationName: string): string {
   return stack.formatArn({
@@ -80,29 +81,12 @@ export function renderAlarmConfiguration(props: renderAlarmConfigProps): CfnDepl
 }
 
 export function deploymentConfig(name: string): IBaseDeploymentConfig & IPredefinedDeploymentConfig {
-  return {
-    deploymentConfigName: name,
-    deploymentConfigArn: arnForDeploymentConfig(name),
-    deploymentConfigRef: {
-      deploymentConfigName: name,
-    },
-    bindEnvironment: (resource) => ({
-      deploymentConfigName: name,
-      deploymentConfigArn: arnForDeploymentConfig(name, resource),
-      deploymentConfigRef: {
-        deploymentConfigName: name,
-      },
-      node: resource.node,
-      env: resource.env,
-    }),
-    // These properties are not used for predefined configs, but required by the interface
-    get node(): any {
-      throw new UnscopedValidationError('Cannot get \'node\' attribute from a predefined deployment config');
-    },
-    get env(): any {
-      throw new UnscopedValidationError('Cannot get \'node\' attribute from a predefined deployment config');
-    },
-  };
+  return new class extends DetachedResource implements IBaseDeploymentConfig, IPredefinedDeploymentConfig  {
+    public readonly deploymentConfigName = name;
+    public readonly deploymentConfigArn = arnForDeploymentConfig(name);
+    public readonly deploymentConfigRef = { deploymentConfigName: name };
+    bindEnvironment() { return this; }
+  }('deploymentConfig');
 }
 
 enum AutoRollbackEvent {
