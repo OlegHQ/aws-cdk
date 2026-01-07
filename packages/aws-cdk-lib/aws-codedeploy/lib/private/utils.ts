@@ -1,11 +1,11 @@
 import { Construct } from 'constructs';
 import { IPredefinedDeploymentConfig } from './predefined-deployment-config';
 import { Token, Stack, ArnFormat, Arn, Fn, Aws, IResource, ValidationError } from '../../../core';
+import { DetachedResource } from '../../../core/lib/private/detached-construct';
 import { IAlarmRef } from '../../../interfaces/generated/aws-cloudwatch-interfaces.generated';
 import { IBaseDeploymentConfig } from '../base-deployment-config';
 import { CfnDeploymentGroup } from '../codedeploy.generated';
 import { AutoRollbackConfig } from '../rollback-config';
-import { DetachedResource } from '../../../core/lib/private/detached-construct';
 
 export function arnForApplication(stack: Stack, applicationName: string): string {
   return stack.formatArn({
@@ -81,7 +81,7 @@ export function renderAlarmConfiguration(props: renderAlarmConfigProps): CfnDepl
 }
 
 export function deploymentConfig(name: string): IBaseDeploymentConfig & IPredefinedDeploymentConfig {
-  return new class extends DetachedResource implements IBaseDeploymentConfig, IPredefinedDeploymentConfig  {
+  return new class extends DetachedResource implements IBaseDeploymentConfig, IPredefinedDeploymentConfig {
     public readonly deploymentConfigName = name;
     public readonly deploymentConfigArn = arnForDeploymentConfig(name);
     public readonly deploymentConfigRef = { deploymentConfigName: name };
