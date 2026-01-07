@@ -96,6 +96,26 @@
    "DependsOn": [
     "CustomAWSCDKOpenIdConnectProviderCustomResourceProviderRole517FED65"
    ]
+  },
+  "OpenIdConnectProviderNative79C2FF59": {
+   "Type": "AWS::IAM::OIDCProvider",
+   "Properties": {
+    "ClientIdList": [
+     "sts.amazonaws.com"
+    ],
+    "Url": {
+     "Fn::Join": [
+      "",
+      [
+       "https://oidc.eks.",
+       {
+        "Ref": "AWS::Region"
+       },
+       ".amazonaws.com/id/test3"
+      ]
+     ]
+    }
+   }
   }
  },
  "Parameters": {

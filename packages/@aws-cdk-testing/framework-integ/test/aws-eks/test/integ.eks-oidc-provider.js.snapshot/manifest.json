@@ -18,7 +18,7 @@
         "validateOnSynth": false,
         "assumeRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-deploy-role-${AWS::AccountId}-${AWS::Region}",
         "cloudFormationExecutionRoleArn": "arn:${AWS::Partition}:iam::${AWS::AccountId}:role/cdk-hnb659fds-cfn-exec-role-${AWS::AccountId}-${AWS::Region}",
-        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/2bdb612121005ec954c1198aa770b874f97bf2df1a0a4a6e97b12ea8e490b6ae.json",
+        "stackTemplateAssetObjectUrl": "s3://cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}/a1708e2368111bae851d50253922220b6d31020ffd6010365ebe7dbfb4b266da.json",
         "requiresBootstrapStackVersion": 6,
         "bootstrapStackVersionSsmParameter": "/cdk-bootstrap/hnb659fds/version",
         "additionalDependencies": [
@@ -80,6 +80,22 @@
           {
             "type": "aws:cdk:logicalId",
             "data": "CustomAWSCDKOpenIdConnectProviderCustomResourceProviderHandlerF2C543E0"
+          }
+        ],
+        "/aws-eks-oidc-provider-test/OpenIdConnectProviderNative": [
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": "*"
+          },
+          {
+            "type": "aws:cdk:analytics:construct",
+            "data": "*"
+          }
+        ],
+        "/aws-eks-oidc-provider-test/OpenIdConnectProviderNative/Resource": [
+          {
+            "type": "aws:cdk:logicalId",
+            "data": "OpenIdConnectProviderNative79C2FF59"
           }
         ],
         "/aws-eks-oidc-provider-test/BootstrapVersion": [
@@ -444,7 +460,7 @@
           },
           "@aws-cdk/aws-eks:useNativeOidcProvider": {
             "recommendedValue": true,
-            "explanation": "When enabled, EKS clusters will use the native OIDC provider instead of the custom resource provider"
+            "explanation": "When enabled, EKS clusters will use the native OIDC provider resource  AWS::IAM::OIDCProvider instead of creating the OIDCProvider with a custom resource."
           },
           "@aws-cdk/aws-ec2:ebsDefaultGp3Volume": {
             "userValue": true,
