@@ -247,8 +247,8 @@ export interface ClusterAttributes {
 
   /**
    * An Open ID Connect provider for this cluster that can be used to configure service accounts.
-   * You can either import an existing provider using `iam.OpenIdConnectProvider.fromProviderArn`,
-   * or create a new provider using `new eks.OpenIdConnectProvider`
+   * You can either import an existing provider using `iam.OpenIdConnectProviderNative.fromProviderArn`,
+   * or create a new provider using `new eks.OpenIdConnectProviderNative`
    * @default - if not specified `cluster.openIdConnectProvider` and `cluster.addServiceAccount` will throw an error.
    */
   readonly openIdConnectProvider?: iam.IOpenIdConnectProvider;
@@ -1519,7 +1519,7 @@ export class Cluster extends ClusterBase {
   public get openIdConnectProvider(): iam.IOpenIdConnectProvider {
     if (!this._openIdConnectProvider) {
       if (FeatureFlags.of(this).isEnabled(EKS_USE_NATIVE_OIDC_PROVIDER)) {
-        this._openIdConnectProvider = new OpenIdConnectProviderNative(this, 'OpenIdConnectProvider', {
+        this._openIdConnectProvider = new OpenIdConnectProviderNative(this, 'OpenIdConnectProviderNative', {
           url: this.clusterOpenIdConnectIssuerUrl,
         });
       } else {

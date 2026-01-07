@@ -1013,7 +1013,7 @@
    "UpdateReplacePolicy": "Delete",
    "DeletionPolicy": "Delete"
   },
-  "ClusterOpenIdConnectProviderE7EB0530": {
+  "ClusterOpenIdConnectProviderNative0DE64D0F": {
    "Type": "AWS::IAM::OIDCProvider",
    "Properties": {
     "ClientIdList": [
