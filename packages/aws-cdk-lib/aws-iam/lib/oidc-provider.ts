@@ -1,6 +1,6 @@
 import { Construct } from 'constructs';
 import { IOIDCProviderRef, OIDCProviderReference } from './iam.generated';
-import { Arn, CustomResource, FeatureFlags, IResource, RemovalPolicies, RemovalPolicy, Resource, Token } from '../../core';
+import { Arn, CustomResource, FeatureFlags, IResource, RemovalPolicy, Resource, Token } from '../../core';
 import { addConstructMetadata } from '../../core/lib/metadata-resource';
 import { propertyInjectable } from '../../core/lib/prop-injectable';
 import { OidcProvider } from '../../custom-resource-handlers/dist/aws-iam/oidc-provider.generated';
@@ -174,10 +174,6 @@ export class OpenIdConnectProvider extends Resource implements IOpenIdConnectPro
     const rejectUnauthorized = FeatureFlags.of(this).isEnabled(IAM_OIDC_REJECT_UNAUTHORIZED_CONNECTIONS) ?? false;
 
     const provider = this.getOrCreateProvider();
-
-    if (props.removalPolicy) {
-      RemovalPolicies.of(provider).apply(props.removalPolicy);
-    }
 
     const resource = new CustomResource(this, 'Resource', {
       resourceType: RESOURCE_TYPE,
