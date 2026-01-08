@@ -1492,7 +1492,7 @@ Resources
 [+] AWS::IAM::OIDCProvider TestCluster/OpenIdConnectProviderNative TestClusterOpenIdConnectProviderNative0BE3F155
 ```
 
-5. Run `cdk import --force` and provide the ARN of the existing OpenIdConnectProvider when prompted. You will get a warning about pending changes to existing resources that is expected.
+5. Run `cdk import --force` and provide the ARN of the existing OpenIdConnectProvider when prompted. You will get a warning about pending changes to existing resources which is expected.
 
 6. Run `cdk deploy` to apply any pending changes. This will apply the destroy/orphan changes in the above example.
 
