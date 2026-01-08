@@ -853,15 +853,15 @@ declare const cluster: eks.Cluster;
 cdk.RemovalPolicies.of(cluster.openIdConnectProvider).apply(cdk.RemovalPolicy.RETAIN);
 ```
 
-2. Run `cdk diff` to verify the changes are expected then `cdk deploy`.
+1. Run `cdk diff` to verify the changes are expected then `cdk deploy`.
 
-3. Add the following to the `context` field of your `cdk.json` to enable the feature flag that creates the native oidc provider.
+2. Add the following to the `context` field of your `cdk.json` to enable the feature flag that creates the native oidc provider.
 
 ```json
 		"@aws-cdk/aws-eks:useNativeOidcProvider": true,
 ```
 
-4. Run `cdk diff` and ensure the changes are expected. Example of an expected diff:
+1. Run `cdk diff` and ensure the changes are expected. Example of an expected diff:
 
 ```bash
 Resources
@@ -871,9 +871,9 @@ Resources
 [+] AWS::IAM::OIDCProvider TestCluster/OpenIdConnectProviderNative TestClusterOpenIdConnectProviderNative0BE3F155
 ```
 
-5. Run `cdk import --force` and provide the ARN of the existing OpenIdConnectProvider when prompted. You will get a warning about pending changes to existing resources which is expected.
+1. Run `cdk import --force` and provide the ARN of the existing OpenIdConnectProvider when prompted. You will get a warning about pending changes to existing resources which is expected.
 
-6. Run `cdk deploy` to apply any pending changes. This will apply the destroy/orphan changes in the above example.
+2. Run `cdk deploy` to apply any pending changes. This will apply the destroy/orphan changes in the above example.
 
 
 If you are creating the OpenIdConnectProvider manually via `new eks.OpenIdConnectProvider`, follow these steps:
@@ -888,13 +888,13 @@ const existingProvider = new eks.OpenIdConnectProvider(this, 'Provider', {
 });
 ```
 
-2. Deploy with the retain policy to avoid deletion of the underlying resource.
+1. Deploy with the retain policy to avoid deletion of the underlying resource.
 
 ```bash
 cdk deploy
 ```
 
-3. Replace `OpenIdConnectProvider` with `OpenIdConnectProviderNative` in your code.
+1. Replace `OpenIdConnectProvider` with `OpenIdConnectProviderNative` in your code.
 
 ```ts
 // Step 3: Replace with native provider
@@ -903,7 +903,7 @@ const nativeProvider = new eks.OpenIdConnectProviderNative(this, 'Provider', {
 });
 ```
 
-4. Run `cdk diff` and verify the changes are expected. Example of an expected diff:
+1. Run `cdk diff` and verify the changes are expected. Example of an expected diff:
 
 ```bash
 Resources
@@ -913,9 +913,9 @@ Resources
 [+] AWS::IAM::OIDCProvider TestCluster/OpenIdConnectProviderNative TestClusterOpenIdConnectProviderNative0BE3F155
 ```
 
-5. Run `cdk import --force` to import the existing OIDC provider resource by providing the existing ARN.
+1. Run `cdk import --force` to import the existing OIDC provider resource by providing the existing ARN.
 
-6. Run `cdk deploy` to apply any pending changes. This will apply the destroy/orphan operations in the example diff above.
+2. Run `cdk deploy` to apply any pending changes. This will apply the destroy/orphan operations in the example diff above.
 
 
 ### Cluster Security Group
