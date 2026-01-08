@@ -91,7 +91,7 @@ export function deploymentConfig(name: string): IBaseDeploymentConfig & IPredefi
         public readonly deploymentConfigArn = arnForDeploymentConfig(name, resource);
         public readonly deploymentConfigRef = { deploymentConfigName: name };
       }('deploymentConfig() -> bindEnvironment()', 'source');
-    };
+    }
   }('deploymentConfig');
 }
 
