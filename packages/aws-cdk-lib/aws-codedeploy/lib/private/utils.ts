@@ -1,7 +1,7 @@
 import { Construct } from 'constructs';
 import { IPredefinedDeploymentConfig } from './predefined-deployment-config';
 import { Token, Stack, ArnFormat, Arn, Fn, Aws, IResource, ValidationError } from '../../../core';
-import { DetachedResource } from '../../../core/lib/private/detached-construct';
+import { DetachedConstruct, DetachedResource } from '../../../core/lib/private/detached-construct';
 import { IAlarmRef } from '../../../interfaces/generated/aws-cloudwatch-interfaces.generated';
 import { IBaseDeploymentConfig } from '../base-deployment-config';
 import { CfnDeploymentGroup } from '../codedeploy.generated';
@@ -85,7 +85,13 @@ export function deploymentConfig(name: string): IBaseDeploymentConfig & IPredefi
     public readonly deploymentConfigName = name;
     public readonly deploymentConfigArn = arnForDeploymentConfig(name);
     public readonly deploymentConfigRef = { deploymentConfigName: name };
-    bindEnvironment() { return this; }
+    bindEnvironment(resource: IResource): IBaseDeploymentConfig {
+      return new class extends DetachedConstruct {
+        public readonly deploymentConfigName = name;
+        public readonly deploymentConfigArn = arnForDeploymentConfig(name, resource);
+        public readonly deploymentConfigRef = { deploymentConfigName: name };
+      }('deploymentConfig() -> bindEnvironment()', 'source');
+    };
   }('deploymentConfig');
 }
 

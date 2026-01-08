@@ -15,7 +15,7 @@ import { IDeploymentGroupRef, IApplicationRef, IDeploymentConfigRef } from '../.
 import { IBaseDeploymentConfig } from '../base-deployment-config';
 import { CfnDeploymentGroup } from '../codedeploy.generated';
 import { ImportedDeploymentGroupBase, DeploymentGroupBase } from '../private/base-deployment-group';
-import { toIServerApplication } from '../private/ref-utils';
+import { toIServerApplication, toIServerDeploymentConfig } from '../private/ref-utils';
 import { renderAlarmConfiguration, renderAutoRollbackConfiguration } from '../private/utils';
 import { AutoRollbackConfig } from '../rollback-config';
 
@@ -87,7 +87,7 @@ class ImportedServerDeploymentGroup extends ImportedDeploymentGroupBase implemen
   }
 
   public get deploymentConfig(): IServerDeploymentConfig {
-    return this._deploymentConfig as IServerDeploymentConfig;
+    return toIServerDeploymentConfig(this._deploymentConfig);
   }
 }
 

@@ -1,4 +1,4 @@
-import { Construct, IConstruct } from 'constructs';
+import { Construct, IConstruct, Node, RootConstruct } from 'constructs';
 import type { IEnvironmentAware, ResourceEnvironment } from '../environment';
 import { UnscopedValidationError } from '../errors';
 
@@ -20,15 +20,17 @@ const CONSTRUCT_SYM = Symbol.for('constructs.Construct');
 export abstract class DetachedConstruct extends Construct implements IConstruct {
   private readonly errorMessage: string;
 
-  constructor(errorMessage: string) {
+  constructor(message: string, messageKind: 'full' | 'source' = 'full') {
     super(null as any, undefined as any);
 
-    this.errorMessage = errorMessage;
+    this.errorMessage = messageKind === 'full'
+      ? message
+      : `Objects returned by ${message} cannot be used in this API: they are not real constructs and do not have a construct tree 'node'`;
 
     // Use Object.defineProperty to override 'node' property instead of a getter
     // to avoid TS2611 error (property vs accessor conflict with base class)
     Object.defineProperty(this, 'node', {
-      get() { throw new UnscopedValidationError(errorMessage); },
+      value: new Node(this, new RootConstruct(), 'DetachedConstruct'),
     });
 
     // Despite extending Construct, DetachedConstruct doesn't work like one.
@@ -60,7 +62,7 @@ export abstract class DetachedConstruct extends Construct implements IConstruct 
  */
 export abstract class DetachedResource extends DetachedConstruct implements IEnvironmentAware {
   constructor(private readonly source: string) {
-    super(`Objects returned by ${source} cannot be used in this API: they are not real constructs and do not have a construct tree 'node'`);
+    super(source, 'source');
   }
 
   public get env(): ResourceEnvironment {
