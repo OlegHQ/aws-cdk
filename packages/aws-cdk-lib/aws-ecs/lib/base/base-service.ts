@@ -854,6 +854,19 @@ export abstract class BaseService extends Resource
       throw new ValidationError('CODE_DEPLOY deploymentController can only be used with the `latest` task definition revision', this);
     }
 
+    if (
+      props.deploymentController?.type === DeploymentControllerType.CODE_DEPLOY
+      && props.capacityProviderStrategies
+      && props.capacityProviderStrategies.length > 0
+    ) {
+      Annotations.of(this).addWarningV2(
+        '@aws-cdk/aws-ecs:codeDeployCapacityProviderLimitation',
+        'Using CODE_DEPLOY deployment controller with capacity provider strategies has limitations. ' +
+        'Changes to capacity provider configuration (such as ASG instance types) cannot be updated via CloudFormation ' +
+        'and require creating a new CodeDeploy deployment directly. See https://github.com/aws/aws-cdk/issues/36563',
+      );
+    }
+
     if (props.minHealthyPercent === undefined) {
       Annotations.of(this).addWarningV2('@aws-cdk/aws-ecs:minHealthyPercent', 'minHealthyPercent has not been configured so the default value of 50% is used. The number of running tasks will decrease below the desired count during deployments etc. See https://github.com/aws/aws-cdk/issues/31705');
     }

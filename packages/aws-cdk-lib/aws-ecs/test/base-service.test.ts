@@ -1,4 +1,4 @@
-import { Template, Match } from '../../assertions';
+import { Annotations, Template, Match } from '../../assertions';
 import * as ec2 from '../../aws-ec2';
 import * as iam from '../../aws-iam';
 import * as kms from '../../aws-kms';
@@ -513,6 +513,92 @@ describe('Blue/Green Deployment', () => {
 
     // THEN
     expect(service.isUsingECSDeploymentController()).toBe(false);
+  });
+});
+
+describe('CODE_DEPLOY with Capacity Provider Strategies', () => {
+  let stack: cdk.Stack;
+  let vpc: ec2.Vpc;
+  let cluster: ecs.Cluster;
+  let taskDefinition: ecs.FargateTaskDefinition;
+
+  beforeEach(() => {
+    stack = new cdk.Stack();
+    vpc = new ec2.Vpc(stack, 'Vpc');
+    cluster = new ecs.Cluster(stack, 'EcsCluster', { vpc });
+    taskDefinition = new ecs.FargateTaskDefinition(stack, 'FargateTaskDef');
+    taskDefinition.addContainer('web', {
+      image: ecs.ContainerImage.fromRegistry('amazon/amazon-ecs-sample'),
+    });
+  });
+
+  test('should emit warning when using CODE_DEPLOY with capacityProviderStrategies', () => {
+    // WHEN
+    new ecs.FargateService(stack, 'FargateService', {
+      cluster,
+      taskDefinition,
+      deploymentController: {
+        type: ecs.DeploymentControllerType.CODE_DEPLOY,
+      },
+      capacityProviderStrategies: [
+        {
+          capacityProvider: 'FARGATE',
+          weight: 1,
+        },
+      ],
+      minHealthyPercent: 100,
+    });
+
+    // THEN
+    Annotations.fromStack(stack).hasWarning(
+      '/Default/FargateService',
+      'Using CODE_DEPLOY deployment controller with capacity provider strategies has limitations. ' +
+      'Changes to capacity provider configuration (such as ASG instance types) cannot be updated via CloudFormation ' +
+      'and require creating a new CodeDeploy deployment directly. See https://github.com/aws/aws-cdk/issues/36563 ' +
+      '[ack: @aws-cdk/aws-ecs:codeDeployCapacityProviderLimitation]',
+    );
+  });
+
+  test('should not emit warning when using CODE_DEPLOY without capacityProviderStrategies', () => {
+    // WHEN
+    new ecs.FargateService(stack, 'FargateService', {
+      cluster,
+      taskDefinition,
+      deploymentController: {
+        type: ecs.DeploymentControllerType.CODE_DEPLOY,
+      },
+      minHealthyPercent: 100,
+    });
+
+    // THEN
+    Annotations.fromStack(stack).hasNoWarning(
+      '/Default/FargateService',
+      Match.stringLikeRegexp('.*codeDeployCapacityProviderLimitation.*'),
+    );
+  });
+
+  test('should not emit warning when using ECS deployment controller with capacityProviderStrategies', () => {
+    // WHEN
+    new ecs.FargateService(stack, 'FargateService', {
+      cluster,
+      taskDefinition,
+      deploymentController: {
+        type: ecs.DeploymentControllerType.ECS,
+      },
+      capacityProviderStrategies: [
+        {
+          capacityProvider: 'FARGATE',
+          weight: 1,
+        },
+      ],
+      minHealthyPercent: 100,
+    });
+
+    // THEN
+    Annotations.fromStack(stack).hasNoWarning(
+      '/Default/FargateService',
+      Match.stringLikeRegexp('.*codeDeployCapacityProviderLimitation.*'),
+    );
   });
 });
 

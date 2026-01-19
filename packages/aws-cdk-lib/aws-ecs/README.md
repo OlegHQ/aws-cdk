@@ -1898,6 +1898,36 @@ const cfnService = service.node.defaultChild as ecs.CfnService;
 cfnService.launchType = 'FARGATE'; // or 'FARGATE_SPOT' depending on your capacity provider
 ```
 
+#### Note: CODE_DEPLOY Deployment Controller with Capacity Provider Strategies
+
+**Understanding the Limitation**
+
+When using the `CODE_DEPLOY` deployment controller with `capacityProviderStrategies`, there are significant limitations on what can be updated via CloudFormation.
+
+AWS ECS services using blue/green (CODE_DEPLOY) deployments have restricted update capabilities. The [UpdateService API](https://docs.aws.amazon.com/AmazonECS/latest/APIReference/API_UpdateService.html) only supports updating: desired count, deployment configuration, health check grace period, task placement constraints/strategies, and tag options.
+
+**Impact**
+
+Changes to capacity provider configuration (such as modifying the underlying Auto Scaling Group instance types) cannot be performed through CloudFormation when using CODE_DEPLOY. Attempting such updates will result in an error:
+
+```
+Invalid request provided: When switching from launch type to capacity provider strategy
+on an existing service, or making a change to a capacity provider strategy on a service
+that is already using one, you must force a new deployment
+```
+
+The `forceNewDeployment` property does not resolve this issue because CODE_DEPLOY deployments must be triggered through AWS CodeDeploy, not CloudFormation.
+
+**Workaround**
+
+To update capacity provider configuration when using CODE_DEPLOY:
+
+1. Create a new CodeDeploy deployment directly using the AWS Console, CLI, or SDK
+2. Include the updated `CapacityProviderStrategy` in your CodeDeploy AppSpec file
+3. Use the [CreateDeployment API](https://docs.aws.amazon.com/codedeploy/latest/APIReference/API_CreateDeployment.html) to trigger the deployment
+
+Alternatively, consider using the ECS deployment controller (`DeploymentControllerType.ECS`) if you need to frequently update capacity provider configurations via CloudFormation.
+
 ### Cluster Default Provider Strategy
 
 A capacity provider strategy determines whether ECS tasks are launched on EC2 instances or Fargate/Fargate Spot. It can be specified at the cluster, service, or task level, and consists of one or more capacity providers. You can specify an optional base and weight value for finer control of how tasks are launched. The `base` specifies a minimum number of tasks on one capacity provider, and the `weight`s of each capacity provider determine how tasks are distributed after `base` is satisfied.
